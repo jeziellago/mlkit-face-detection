@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ML Kit Face Detection</string>
+    <string name="capture">Capture</string>
+    <string name="error_try_again">Ops.. try again :( </string>
+</resources>

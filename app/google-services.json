@@ -1,0 +1,73 @@
+{
+  "project_info": {
+    "project_number": "47467963281",
+    "firebase_url": "https://teste-6fe4b.firebaseio.com",
+    "project_id": "teste-6fe4b",
+    "storage_bucket": "teste-6fe4b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:47467963281:android:14bcffdf2bf5bc50",
+        "android_client_info": {
+          "package_name": "jeziel.firebase.nn"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "47467963281-7hsqi58v9khs5l9fmar8f1m2fnkvgmlr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC735GYaohh9DYinjuohhSeqX-1G_iqbH8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:47467963281:android:9d5cee0235450af9",
+        "android_client_info": {
+          "package_name": "jeziellago.android.mlkit.mlkitfacedetection"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "47467963281-7hsqi58v9khs5l9fmar8f1m2fnkvgmlr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC735GYaohh9DYinjuohhSeqX-1G_iqbH8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
