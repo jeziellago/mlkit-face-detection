@@ -1,1 +1,1 @@
-# mlkit-face-detection
+# ML Kit Face Detection Example
