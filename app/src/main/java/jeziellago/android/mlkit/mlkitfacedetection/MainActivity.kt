@@ -2,22 +2,21 @@ package jeziellago.android.mlkit.mlkitfacedetection
 
 import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.*
+import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.provider.MediaStore
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
+import android.support.v4.content.FileProvider.getUriForFile
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
+import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark.*
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
-import android.support.v4.app.ActivityCompat
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.support.v4.content.ContextCompat
-import android.support.v4.content.FileProvider
-import android.support.v4.content.FileProvider.getUriForFile
 
 
 class MainActivity : AppCompatActivity() {
@@ -29,7 +28,6 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val REQUEST_CAPTURE_IMAGE = 100
         private const val REQUEST_CAMERA_PERMISSION = 123
-        private const val IMAGE_DATA = "data"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,10 +51,25 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupFaceDetector() {
         faceDetector = FaceDetector( trackingEnabled = true,
-            successListener = OnSuccessListener {
-                val rects = ArrayList<Rect>()
-                it.forEach { rects.add(it.boundingBox) }
-                drawBoundingBox(rects, currentImage!!)
+            successListener = OnSuccessListener { faces ->
+                val detectedFaces = ArrayList<DetectedFace>()
+                faces.forEach { face ->
+                    val detectedFace = DetectedFace(
+                        boundingBox = face.boundingBox,
+                        leftEar = face.getLandmark(LEFT_EAR),
+                        rightEar = face.getLandmark(RIGHT_EAR),
+                        leftEye = face.getLandmark(LEFT_EYE),
+                        rightEye = face.getLandmark(RIGHT_EYE),
+                        leftMouth = face.getLandmark(LEFT_MOUTH),
+                        rightMouth = face.getLandmark(RIGHT_MOUTH),
+                        bottomMouth = face.getLandmark(BOTTOM_MOUTH),
+                        leftCheek = face.getLandmark(LEFT_CHEEK),
+                        rightCheek = face.getLandmark(RIGHT_CHEEK),
+                        noseBase = face.getLandmark(NOSE_BASE)
+                    )
+                    detectedFaces.add(detectedFace)
+                }
+                drawDetection(detectedFaces, currentImage!!)
             },
             failureListener = OnFailureListener {
                 Toast.makeText(this@MainActivity,
@@ -87,7 +100,7 @@ class MainActivity : AppCompatActivity() {
         faceDetector?.detectFromBitmap(bmpImage)
     }
 
-    private fun drawBoundingBox(rects: List<Rect>, currentImage: Bitmap) {
+    private fun drawDetection(faces: ArrayList<DetectedFace>, currentImage: Bitmap) {
         var bmp = Bitmap.createBitmap(
                 currentImage.width,
                 currentImage.height,
@@ -97,9 +110,16 @@ class MainActivity : AppCompatActivity() {
         val paint = Paint()
         paint.color = Color.RED
         paint.style = Paint.Style.STROKE
-        paint.strokeWidth = 5f
+        paint.strokeWidth = 15f
 
-        rects.forEach { canvas.drawRect(it, paint) }
+        faces.forEach {
+            canvas.drawRect(it.boundingBox, paint)
+            canvas.drawPoints(it.earsPoints(), paint)
+            canvas.drawPoints(it.cheekPoints(), paint)
+            canvas.drawPoints(it.eyesPoints(), paint)
+            canvas.drawPoints(it.mouthPoints(), paint)
+            canvas.drawPoints(it.nosePoints(), paint)
+        }
         overlay.setImageBitmap(bmp)
     }
 
