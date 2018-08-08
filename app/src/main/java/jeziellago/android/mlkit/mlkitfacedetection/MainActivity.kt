@@ -52,13 +52,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupFaceDetector() {
-        faceDetector = FaceDetector(
-            OnSuccessListener {
+        faceDetector = FaceDetector( trackingEnabled = true,
+            successListener = OnSuccessListener {
                 val rects = ArrayList<Rect>()
                 it.forEach { rects.add(it.boundingBox) }
                 drawBoundingBox(rects, currentImage!!)
             },
-            OnFailureListener {
+            failureListener = OnFailureListener {
                 Toast.makeText(this@MainActivity,
                         getString(R.string.error_try_again),
                         Toast.LENGTH_SHORT).show()
@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity() {
     private fun detect(bmpImage: Bitmap) {
         image.setImageBitmap(bmpImage)
         currentImage = bmpImage
-        faceDetector?.detect(bmpImage)
+        faceDetector?.detectFromBitmap(bmpImage)
     }
 
     private fun drawBoundingBox(rects: List<Rect>, currentImage: Bitmap) {
