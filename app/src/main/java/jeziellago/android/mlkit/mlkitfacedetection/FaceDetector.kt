@@ -21,7 +21,7 @@ internal class FaceDetector(trackingEnabled: Boolean,
             .setModeType(ACCURATE_MODE)
             .setLandmarkType(ALL_LANDMARKS)
             .setClassificationType(ALL_CLASSIFICATIONS)
-            .setMinFaceSize(0.15f)
+            .setMinFaceSize(0.1f)
             .setTrackingEnabled(trackingEnabled)
             .build()
 
