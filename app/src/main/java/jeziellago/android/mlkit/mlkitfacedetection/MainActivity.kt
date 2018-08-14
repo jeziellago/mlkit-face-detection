@@ -1,39 +1,36 @@
 package jeziellago.android.mlkit.mlkitfacedetection
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.*
-import android.net.Uri
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.hardware.camera2.CameraDevice
 import android.os.Bundle
-import android.provider.MediaStore
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
-import android.support.v4.content.FileProvider.getUriForFile
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark.*
+import com.otaliastudios.cameraview.SessionType
 import kotlinx.android.synthetic.main.activity_main.*
-import java.io.File
 
 
 class MainActivity : AppCompatActivity() {
 
     private var faceDetector: FaceDetector? = null
-    private var currentImage: Bitmap? = null
-    private var currentPath: Uri? = null
+    private var loadingDetection = false
 
     companion object {
-        private const val REQUEST_CAPTURE_IMAGE = 100
         private const val REQUEST_CAMERA_PERMISSION = 123
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        btn_capture.setOnClickListener { capture() }
         setupFaceDetector()
         checkCameraPermission()
     }
@@ -45,7 +42,8 @@ class MainActivity : AppCompatActivity() {
                     arrayOf(Manifest.permission.CAMERA,
                             Manifest.permission.WRITE_EXTERNAL_STORAGE),
                     REQUEST_CAMERA_PERMISSION)
-            btn_capture.isEnabled = true
+        } else {
+            camera_preview.start()
         }
     }
 
@@ -69,48 +67,40 @@ class MainActivity : AppCompatActivity() {
                     )
                     detectedFaces.add(detectedFace)
                 }
-                drawDetection(detectedFaces, currentImage!!)
+                drawDetection(detectedFaces)
+                loadingDetection = false
             },
             failureListener = OnFailureListener {
                 Toast.makeText(this@MainActivity,
                         getString(R.string.error_try_again),
                         Toast.LENGTH_SHORT).show()
             })
+
+        camera_preview.addFrameProcessor {
+            if (!loadingDetection) {
+                detect(it.data)
+            }
+        }
     }
 
-    private fun capture() {
-        currentPath = createImageFile()
-        val pictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        pictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, currentPath)
-        startActivityForResult(pictureIntent, REQUEST_CAPTURE_IMAGE)
+    private fun detect(data: ByteArray) {
+        loadingDetection = true
+        faceDetector?.detectFromByteArray(data)
     }
 
-    private fun createImageFile(): Uri {
-        val imgDir = externalCacheDir
-        if (!imgDir.exists()) imgDir.mkdirs()
-
-        val imgFile = File(imgDir, "face.jpg")
-        return getUriForFile(this,
-                BuildConfig.APPLICATION_ID + ".fileprovider", imgFile)
-    }
-
-    private fun detect(bmpImage: Bitmap) {
-        image.setImageBitmap(bmpImage)
-        currentImage = bmpImage
-        faceDetector?.detectFromBitmap(bmpImage)
-    }
-
-    private fun drawDetection(faces: ArrayList<DetectedFace>, currentImage: Bitmap) {
+    private fun drawDetection(faces: ArrayList<DetectedFace>) {
+        val width = 960
+        val height = 1280
         var bmp = Bitmap.createBitmap(
-                currentImage.width,
-                currentImage.height,
-                currentImage.config)
+                width,
+                height,
+                Bitmap.Config.ARGB_8888)
 
         val canvas = Canvas(bmp)
         val paint = Paint()
         paint.color = Color.RED
         paint.style = Paint.Style.STROKE
-        paint.strokeWidth = 15f
+        paint.strokeWidth = 5f
 
         faces.forEach {
             canvas.drawRect(it.boundingBox, paint)
@@ -128,19 +118,8 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
                     && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                btn_capture.isEnabled = true
+                camera_preview.start()
             }
         }
     }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == REQUEST_CAPTURE_IMAGE && resultCode == RESULT_OK) {
-            val input = contentResolver.openInputStream(currentPath)
-            val bmpImage = BitmapFactory.decodeStream(input)
-            detect(bmpImage)
-        }
-    }
-
 }

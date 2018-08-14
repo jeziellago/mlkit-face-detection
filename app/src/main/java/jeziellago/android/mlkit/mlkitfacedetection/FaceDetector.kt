@@ -5,6 +5,7 @@ import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import com.google.firebase.ml.vision.face.FirebaseVisionFace
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetector
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
@@ -15,6 +16,7 @@ internal class FaceDetector(trackingEnabled: Boolean,
                             private val failureListener: OnFailureListener) {
 
     private val detector: FirebaseVisionFaceDetector
+    private val metadata: FirebaseVisionImageMetadata
 
     init {
         val detectorOptions = FirebaseVisionFaceDetectorOptions.Builder()
@@ -26,10 +28,21 @@ internal class FaceDetector(trackingEnabled: Boolean,
             .build()
 
         detector = FirebaseVision.getInstance().getVisionFaceDetector(detectorOptions)
+
+        metadata = FirebaseVisionImageMetadata.Builder()
+                .setWidth(1280)
+                .setHeight(960)
+                .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_YV12)
+                .setRotation(FirebaseVisionImageMetadata.ROTATION_90)
+                .build()
     }
 
     fun detectFromBitmap(bmp: Bitmap) {
         detect(FirebaseVisionImage.fromBitmap(bmp))
+    }
+
+    fun detectFromByteArray(byteArray: ByteArray) {
+        detect(FirebaseVisionImage.fromByteArray(byteArray, metadata))
     }
 
     private fun detect(firebaseVisionImage: FirebaseVisionImage) {
