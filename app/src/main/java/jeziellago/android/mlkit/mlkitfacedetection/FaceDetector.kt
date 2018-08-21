@@ -11,7 +11,9 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetector
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions.*
 
-internal class FaceDetector(trackingEnabled: Boolean,
+internal class FaceDetector(cameraWidth: Int,
+                            cameraHeight: Int,
+                            trackingEnabled: Boolean,
                             private val successListener: OnSuccessListener<in List<FirebaseVisionFace>>,
                             private val failureListener: OnFailureListener) {
 
@@ -30,8 +32,8 @@ internal class FaceDetector(trackingEnabled: Boolean,
         detector = FirebaseVision.getInstance().getVisionFaceDetector(detectorOptions)
 
         metadata = FirebaseVisionImageMetadata.Builder()
-                .setWidth(1280)
-                .setHeight(960)
+                .setWidth(cameraHeight)
+                .setHeight(cameraWidth)
                 .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_YV12)
                 .setRotation(FirebaseVisionImageMetadata.ROTATION_90)
                 .build()
