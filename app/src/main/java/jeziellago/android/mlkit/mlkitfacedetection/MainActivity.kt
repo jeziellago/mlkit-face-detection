@@ -28,6 +28,7 @@ class MainActivity : AppCompatActivity() {
 
     private var cameraWidth: Int = 0
     private var cameraHeight: Int = 0
+    private var isLoadingDetection = false
 
     companion object { private const val REQUEST_CAMERA_PERMISSION = 123 }
 
@@ -35,12 +36,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         checkCameraPermission()
-        camera_preview.addFrameProcessor { detect(it) }
+        camera_preview.addFrameProcessor { if (!isLoadingDetection) detect(it) }
     }
 
     private fun detect(frame: Frame) {
         if (cameraWidth > 0 && cameraHeight > 0) {
             faceDetector?.detectFromByteArray(frame.data)
+            isLoadingDetection = true
         } else {
             cameraWidth = frame.size.width
             cameraHeight = frame.size.height
@@ -53,14 +55,18 @@ class MainActivity : AppCompatActivity() {
             cameraWidth = cameraWidth,
             cameraHeight = cameraHeight,
             trackingEnabled = true,
-            successListener = OnSuccessListener { detectionViewer?.showDetection(it) },
+            successListener = OnSuccessListener {
+                if (it.isNotEmpty())
+                    overlay.setImageBitmap(detectionViewer?.showDetection(it))
+                isLoadingDetection = false
+            },
             failureListener = OnFailureListener {
                 Toast.makeText(this@MainActivity,
                     getString(R.string.error_try_again),
                     Toast.LENGTH_SHORT).show()
             })
 
-        detectionViewer = DetectionViewer(cameraWidth, cameraHeight, overlay)
+        detectionViewer = DetectionViewer(cameraWidth, cameraHeight)
     }
 
     private fun checkCameraPermission() {

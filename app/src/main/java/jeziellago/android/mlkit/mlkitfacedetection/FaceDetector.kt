@@ -32,8 +32,8 @@ internal class FaceDetector(cameraWidth: Int,
         detector = FirebaseVision.getInstance().getVisionFaceDetector(detectorOptions)
 
         metadata = FirebaseVisionImageMetadata.Builder()
-                .setWidth(cameraHeight)
-                .setHeight(cameraWidth)
+                .setWidth(cameraWidth)
+                .setHeight(cameraHeight)
                 .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_YV12)
                 .setRotation(FirebaseVisionImageMetadata.ROTATION_90)
                 .build()
