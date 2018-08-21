@@ -56,8 +56,7 @@ class MainActivity : AppCompatActivity() {
             cameraHeight = cameraHeight,
             trackingEnabled = true,
             successListener = OnSuccessListener {
-                if (it.isNotEmpty())
-                    overlay.setImageBitmap(detectionViewer?.showDetection(it))
+                overlay.setImageBitmap(detectionViewer?.showDetection(it))
                 isLoadingDetection = false
             },
             failureListener = OnFailureListener {
