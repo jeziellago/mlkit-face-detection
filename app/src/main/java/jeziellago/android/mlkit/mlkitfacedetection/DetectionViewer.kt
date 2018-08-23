@@ -12,23 +12,24 @@ internal class DetectionViewer(private val cameraWidth: Int,
 
     fun showDetection(faces: List<FirebaseVisionFace>): Bitmap {
         val detectedFaces = ArrayList<DetectedFace>()
-        faces.forEach { face ->
-            val detectedFace = DetectedFace(
-                    boundingBox = face.boundingBox,
-                    leftEar = face.getLandmark(FirebaseVisionFaceLandmark.LEFT_EAR),
-                    rightEar = face.getLandmark(FirebaseVisionFaceLandmark.RIGHT_EAR),
-                    leftEye = face.getLandmark(FirebaseVisionFaceLandmark.LEFT_EYE),
-                    rightEye = face.getLandmark(FirebaseVisionFaceLandmark.RIGHT_EYE),
-                    leftMouth = face.getLandmark(FirebaseVisionFaceLandmark.LEFT_MOUTH),
-                    rightMouth = face.getLandmark(FirebaseVisionFaceLandmark.RIGHT_MOUTH),
-                    bottomMouth = face.getLandmark(FirebaseVisionFaceLandmark.BOTTOM_MOUTH),
-                    leftCheek = face.getLandmark(FirebaseVisionFaceLandmark.LEFT_CHEEK),
-                    rightCheek = face.getLandmark(FirebaseVisionFaceLandmark.RIGHT_CHEEK),
-                    noseBase = face.getLandmark(FirebaseVisionFaceLandmark.NOSE_BASE)
-            )
-            detectedFaces.add(detectedFace)
+        faces.forEach {
+            with(it) {
+                val detectedFace = DetectedFace(
+                    boundingBox = boundingBox,
+                    leftEar = getLandmark(FirebaseVisionFaceLandmark.LEFT_EAR),
+                    rightEar = getLandmark(FirebaseVisionFaceLandmark.RIGHT_EAR),
+                    leftEye = getLandmark(FirebaseVisionFaceLandmark.LEFT_EYE),
+                    rightEye = getLandmark(FirebaseVisionFaceLandmark.RIGHT_EYE),
+                    leftMouth = getLandmark(FirebaseVisionFaceLandmark.LEFT_MOUTH),
+                    rightMouth = getLandmark(FirebaseVisionFaceLandmark.RIGHT_MOUTH),
+                    bottomMouth = getLandmark(FirebaseVisionFaceLandmark.BOTTOM_MOUTH),
+                    leftCheek = getLandmark(FirebaseVisionFaceLandmark.LEFT_CHEEK),
+                    rightCheek = getLandmark(FirebaseVisionFaceLandmark.RIGHT_CHEEK),
+                    noseBase = getLandmark(FirebaseVisionFaceLandmark.NOSE_BASE)
+                )
+                detectedFaces.add(detectedFace)
+            }
         }
-
         return drawDetection(detectedFaces)
     }
 
@@ -45,12 +46,14 @@ internal class DetectionViewer(private val cameraWidth: Int,
         paint.strokeWidth = 5f
 
         detectedFaces.forEach {
-            canvas.drawRect(it.boundingBox, paint)
-            canvas.drawPoints(it.earsPoints(), paint)
-            canvas.drawPoints(it.cheekPoints(), paint)
-            canvas.drawPoints(it.eyesPoints(), paint)
-            canvas.drawPoints(it.mouthPoints(), paint)
-            canvas.drawPoints(it.nosePoints(), paint)
+            with(canvas) {
+                drawRect(it.boundingBox, paint)
+                drawPoints(it.earsPoints(), paint)
+                drawPoints(it.cheekPoints(), paint)
+                drawPoints(it.eyesPoints(), paint)
+                drawPoints(it.mouthPoints(), paint)
+                drawPoints(it.nosePoints(), paint)
+            }
         }
         return bmp
     }

@@ -39,9 +39,7 @@ internal class FaceDetector(cameraWidth: Int,
                 .build()
     }
 
-    fun detectFromBitmap(bmp: Bitmap) {
-        detect(FirebaseVisionImage.fromBitmap(bmp))
-    }
+    fun detectFromBitmap(bmp: Bitmap) = detect(FirebaseVisionImage.fromBitmap(bmp))
 
     fun detectFromByteArray(byteArray: ByteArray) {
         detect(FirebaseVisionImage.fromByteArray(byteArray, metadata))
