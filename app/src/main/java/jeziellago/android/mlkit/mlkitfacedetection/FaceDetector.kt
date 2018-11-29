@@ -1,8 +1,10 @@
 package jeziellago.android.mlkit.mlkitfacedetection
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
+import com.google.android.gms.vision.face.FaceDetector.ACCURATE_MODE
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
@@ -13,7 +15,7 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions.*
 
 internal class FaceDetector(cameraWidth: Int,
                             cameraHeight: Int,
-                            trackingEnabled: Boolean,
+                            enableContours: Boolean = true,
                             private val successListener: OnSuccessListener<in List<FirebaseVisionFace>>,
                             private val failureListener: OnFailureListener) {
 
@@ -22,11 +24,12 @@ internal class FaceDetector(cameraWidth: Int,
 
     init {
         val detectorOptions = FirebaseVisionFaceDetectorOptions.Builder()
-            .setModeType(ACCURATE_MODE)
-            .setLandmarkType(ALL_LANDMARKS)
-            .setClassificationType(ALL_CLASSIFICATIONS)
+            .setPerformanceMode(ACCURATE_MODE)
+            .setLandmarkMode(if (enableContours) NO_LANDMARKS else ALL_LANDMARKS)
+            .setClassificationMode(if (enableContours) NO_CLASSIFICATIONS else ALL_CLASSIFICATIONS)
+            .setContourMode(if (enableContours) ALL_CONTOURS else NO_CONTOURS)
             .setMinFaceSize(0.1f)
-            .setTrackingEnabled(trackingEnabled)
+            .enableTracking()
             .build()
 
         detector = FirebaseVision.getInstance().getVisionFaceDetector(detectorOptions)
@@ -34,8 +37,8 @@ internal class FaceDetector(cameraWidth: Int,
         metadata = FirebaseVisionImageMetadata.Builder()
                 .setWidth(cameraWidth)
                 .setHeight(cameraHeight)
-                .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_YV12)
-                .setRotation(FirebaseVisionImageMetadata.ROTATION_90)
+                .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_NV21)
+                .setRotation(FirebaseVisionImageMetadata.ROTATION_270)
                 .build()
     }
 

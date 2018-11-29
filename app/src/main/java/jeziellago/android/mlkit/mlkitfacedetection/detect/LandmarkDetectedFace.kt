@@ -1,12 +1,11 @@
-package jeziellago.android.mlkit.mlkitfacedetection
+package jeziellago.android.mlkit.mlkitfacedetection.detect
 
 import android.graphics.Rect
 import com.google.firebase.ml.vision.common.FirebaseVisionPoint
-import com.google.firebase.ml.vision.face.FirebaseVisionFaceContour
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark
 
-internal class DetectedFace(
-    val boundingBox: Rect,
+internal class LandmarkDetectedFace(
+    boundingBox: Rect,
     private val leftEar: FirebaseVisionFaceLandmark?,
     private val rightEar: FirebaseVisionFaceLandmark?,
     private val leftEye: FirebaseVisionFaceLandmark?,
@@ -17,7 +16,7 @@ internal class DetectedFace(
     private val leftCheek: FirebaseVisionFaceLandmark?,
     private val rightCheek: FirebaseVisionFaceLandmark?,
     private val noseBase: FirebaseVisionFaceLandmark?
-) {
+): DetectedFace(boundingBox) {
 
     fun earsPoints() =  makeLandmarkPoints(leftEar, rightEar)
     fun eyesPoints() =  makeLandmarkPoints(leftEye, rightEye)
@@ -30,21 +29,6 @@ internal class DetectedFace(
         val points = ArrayList<FirebaseVisionPoint>()
         landmarks.forEach { if (it != null) points.add(it.position) }
         return makePoints(points)
-    }
-
-    private fun makeContourPoints(vararg contours: FirebaseVisionFaceContour): FloatArray {
-        val points = ArrayList<FirebaseVisionPoint>()
-        contours.forEach {  if (it.points != null) points.add(it.points) }
-    }
-
-    private fun makePoints(points: ArrayList<FirebaseVisionPoint>): FloatArray {
-        val floatPoints = FloatArray(points.size * 2)
-        var index = 0
-        points.forEach {
-            floatPoints[index++] = it.x
-            floatPoints[index++] = it.y
-        }
-        return floatPoints
     }
 
 }

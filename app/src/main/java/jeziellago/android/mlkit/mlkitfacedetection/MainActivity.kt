@@ -4,13 +4,18 @@ import android.Manifest.permission.CAMERA
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Bundle
+import android.os.SystemClock
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
+import com.otaliastudios.cameraview.CameraOptions
+import com.otaliastudios.cameraview.Facing
 import com.otaliastudios.cameraview.Frame
+import com.otaliastudios.cameraview.SessionType
+import jeziellago.android.mlkit.mlkitfacedetection.detect.DetectionViewer
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -23,13 +28,17 @@ class MainActivity : AppCompatActivity() {
     private var cameraHeight: Int = 0
     private var isLoadingDetection = false
 
-    companion object { private const val REQUEST_CAMERA_PERMISSION = 123 }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         checkCameraPermission()
-        camera_preview.addFrameProcessor { if (!isLoadingDetection) detect(it) }
+
+        with(camera_preview) {
+            facing = Facing.FRONT
+            scaleX = -1f
+            addFrameProcessor { if (!isLoadingDetection) detect(it) }
+        }
+
     }
 
     private fun detect(frame: Frame) {
@@ -47,9 +56,9 @@ class MainActivity : AppCompatActivity() {
         faceDetector = FaceDetector(
             cameraWidth = cameraWidth,
             cameraHeight = cameraHeight,
-            trackingEnabled = true,
             successListener = OnSuccessListener {
-                overlay.setImageBitmap(detectionViewer?.showDetection(it))
+                val bmp = detectionViewer?.showDetection(it)
+                overlay.setImageBitmap(bmp)
                 isLoadingDetection = false
             },
             failureListener = OnFailureListener {
@@ -82,4 +91,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    companion object { private const val REQUEST_CAMERA_PERMISSION = 123 }
 }
