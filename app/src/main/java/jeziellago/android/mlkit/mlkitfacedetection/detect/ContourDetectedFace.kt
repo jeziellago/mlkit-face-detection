@@ -1,11 +1,11 @@
-package jeziellago.android.mlkit.mlkitfacedetection
+package jeziellago.android.mlkit.mlkitfacedetection.detect
 
 import android.graphics.Rect
 import com.google.firebase.ml.vision.common.FirebaseVisionPoint
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark
 
-internal class DetectedFace(
-    val boundingBox: Rect,
+internal class LandmarkDetectedFace(
+    boundingBox: Rect,
     private val leftEar: FirebaseVisionFaceLandmark?,
     private val rightEar: FirebaseVisionFaceLandmark?,
     private val leftEye: FirebaseVisionFaceLandmark?,
@@ -16,26 +16,19 @@ internal class DetectedFace(
     private val leftCheek: FirebaseVisionFaceLandmark?,
     private val rightCheek: FirebaseVisionFaceLandmark?,
     private val noseBase: FirebaseVisionFaceLandmark?
-) {
+): DetectedFace(boundingBox) {
 
-    fun earsPoints() =  makePoints(leftEar, rightEar)
-    fun eyesPoints() =  makePoints(leftEye, rightEye)
-    fun cheekPoints() =  makePoints(leftCheek, rightCheek)
-    fun mouthPoints() =  makePoints(leftMouth, rightMouth, bottomMouth)
-    fun nosePoints() =  makePoints(noseBase)
+    fun earsPoints() =  makeLandmarkPoints(leftEar, rightEar)
+    fun eyesPoints() =  makeLandmarkPoints(leftEye, rightEye)
+    fun cheekPoints() =  makeLandmarkPoints(leftCheek, rightCheek)
+    fun mouthPoints() =  makeLandmarkPoints(leftMouth, rightMouth, bottomMouth)
+    fun nosePoints() =  makeLandmarkPoints(noseBase)
 
-    private fun makePoints(vararg landmarks: FirebaseVisionFaceLandmark?): FloatArray {
+    private fun makeLandmarkPoints(vararg landmarks: FirebaseVisionFaceLandmark?): FloatArray {
 
         val points = ArrayList<FirebaseVisionPoint>()
         landmarks.forEach { if (it != null) points.add(it.position) }
-
-        val floatPoints = FloatArray(points.size * 2)
-        var index = 0
-        points.forEach {
-            floatPoints[index++] = it.x
-            floatPoints[index++] = it.y
-        }
-        return floatPoints
+        return makePoints(points)
     }
 
 }
